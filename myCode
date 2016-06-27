@@ -1,0 +1,159 @@
+/*-------defining Inputs------*/
+#define LS A0      // left sensor
+#define RS A1	   // right sensor
+#define TS A2	   // trash sensor
+#define inPin 2    // push button
+
+/*-------defining Outputs------*/
+#define LM1 3		// left motor terminal 1 and 2
+#define LM2 4						
+#define RM1 5       // right motor terminal 1 and 2
+#define RM2 6
+#define TM1 7		// trash lid motor terminal 1 and 2
+#define TM2 8						
+#define BZ  12		// buzzer
+
+/*------LIBRARY DEFINE------*/
+#include<SoftwareSerial.h>
+
+/*------GLOBAL VARIABLES DEFINE------*/
+SoftwareSerial mySerial(0,1);
+int LeftIR=0;
+int RightIR=0;
+int TrashIR=0;
+int val = 0;
+
+/*------SMS FUNCTION------*/
+void SendMessage()
+{
+	mySerial.println("AT+CMGF=1"); //Sets in Text module
+	delay(1000);
+	mySerial.println("AT+CMGS=\"+919600264511\"\r");
+	delay(1000);
+	mySerial.println("Trash can is FULL, please Empty it");
+	delay(1000);
+	mySerial.println((char)26); //ASCII code of CTRL+Z
+	delay(1000);
+	CALL();
+}
+
+/*------SETUP FUNCTION------*/
+void setup()
+{
+	mySerial.begin(19200);
+	Serial.begin(19200);
+	delay(100);
+	pinMode(LS, INPUT);
+	pinMode(RS, INPUT);
+	pinMode(TS, INPUT);
+	pinMode(inPin, INPUT);
+	pinMode(LM1, OUTPUT);
+	pinMode(LM2, OUTPUT);
+	pinMode(RM1, OUTPUT);
+	pinMode(RM2, OUTPUT);
+	pinMode(BZ, OUTPUT); 
+	pinMode(LED, OUTPUT);
+	pinMode(EM, OUTPUT); 
+}
+
+/*------LOOP FUNCTION------*/
+void loop()
+{
+	LeftIR = analogRead(LS);
+	RightIR = analogRead(RS);
+	TrashIR = analogRead(TS);
+	val = digitalRead(inPin);  // read input value
+	delay(1000)
+	if(val == LOW)		// button pressed 
+	{
+	  if(analogRead(TS) == HIGH)	//Sensor of Trash can, checks if there's any trash, 
+	  {								//If YES detects and goes HIGH, and on HIGH following code should execute 
+		Serial.println(TS);
+		   
+		delay(2000);
+		
+		digitalWrite(TM1, LOW);		// Trash can lid rotates in clockwise thus closing the lid
+		digitalWrite(TM2, HIGH);
+	  
+		tone(13,200,3500); 
+											//Stops
+		digitalWrite(LM1, HIGH);
+		digitalWrite(LM2, HIGH);
+		
+		delay(1000);
+		
+		digitalWrite(RM1, HIGH);
+		digitalWrite(RM2, HIGH);
+		
+		if(Serial.available()>0)
+		{
+			SendMessage();
+		}
+		if(mySerial.available()>0)
+		{
+			Serial.write(mySerial.read());
+		}
+	  }
+	  else{						 //	If not HIGH, executes Line Following code 
+	  if(LeftIR > RightIR)       // Turn left
+	  {
+		Serial.println(LS);
+		Serial.println(RS);
+		
+		digitalWrite(TM1, HIGH);	// Trash can lid rotates in anticlockwise thus opening the lid
+		digitalWrite(TM2, LOW); 
+		
+		digitalWrite(LM1, LOW);
+		digitalWrite(LM2, LOW);
+		
+		delay(1000);
+		
+		digitalWrite(RM1, LOW);
+		digitalWrite(RM2, HIGH);
+	  }
+	  
+	  if(LeftIR < RightIR)       // Turn right
+	  {
+		Serial.println(LS);
+		Serial.println(RS);
+		
+		digitalWrite(EM, LOW);
+		
+		delay(1000);
+		
+		digitalWrite(RM1, LOW);
+		digitalWrite(RM2, LOW);
+		
+		delay(1000);
+		
+		digitalWrite(LM1, LOW);
+		digitalWrite(LM2, HIGH);
+	  }
+	  
+	  if(LeftIR == RightIR)      // stop
+	  {
+		Serial.println(LS);
+		Serial.println(RS);
+			
+		digitalWrite(TM1, LOW);		// Trash can lid rotates in clockwise thus closing the lid
+		digitalWrite(TM2, HIGH);
+		
+		delay(1000);
+
+		digitalWrite(RM1, HIGH);
+		digitalWrite(RM2, HIGH);
+		
+		digitalWrite(LM1, HIGH);
+		digitalWrite(LM2, HIGH);
+		
+		delay(1000);
+	  
+		tone(13,100,3000);
+
+		delay(1000);    
+	  }
+	  }
+	}
+	  else{							// button released
+	  }
+}
