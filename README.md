@@ -15,3 +15,4 @@
 ##Documentation
 Please Refer to https://docs.google.com/document/d/1Dn_NV45EYGUTs-iMk_DwxNzXPShE4KNdzfUtiiBjUjg/edit?ts=5757e54a
 
+***Affiliated IoTA(Internet of Things Alliance), Department of IT, SRM University***
