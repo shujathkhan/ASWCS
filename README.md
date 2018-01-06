@@ -1,4 +1,5 @@
 # Autonomous Smart Waste Collection System
+This Smart dustbin project moves on its own when called and collects the trash, thus improving the workflow, but not only that, it’s smart too, as it sends an SMS to the workers to come and collect the trash, also works on completely wireless backup power. Thus, making it a more smart and efficient.
 ## Getting Started
 * Download the Git repository as a ZIP ("Download ZIP" button)
 * Unzip
